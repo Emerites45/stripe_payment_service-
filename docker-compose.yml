@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # 1. Base de données PostgreSQL (Image Alpine 15)
+  postgres:
+    image: postgres:15-alpine
+    container_name: payment-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: payment_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. Serveur Eureka Discovery
+  discovery-service:
+    image: steeltoeoss/eureka-server:latest
+    container_name: discovery-service
+    restart: always
+    ports:
+      - "8761:8761"
+
+  # 3. Microservice Payment (NestJS)
+  payment-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: payment-service
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      
+      # Connexion PostgreSQL
+      DATABASE_URL: postgres://postgres:postgrespassword@postgres:5432/payment_db
+      
+      # Keys Stripe
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+
+      # Eureka Service Configuration
+      EUREKA_HOST: discovery-service
+      EUREKA_PORT: 8761
+      SERVICE_NAME: PAYMENT-SERVICE
+      SERVICE_HOST: payment-service
+      SERVICE_PORT: 3000
+      EUREKA_START_DELAY_MS: 5000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      discovery-service:
+        condition: service_started
+
+volumes:
+  postgres_data:
