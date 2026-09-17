@@ -9,6 +9,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { PayoutsModule } from './payouts/payouts.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { HealthModule } from './health/health.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { HealthModule } from './health/health.module';
     PayoutsModule,
     WebhooksModule,
     HealthModule,
+    SubscriptionsModule,
   ],
 })
 export class AppModule {}

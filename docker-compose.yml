@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: postgrespassword
       POSTGRES_DB: payment_db
     ports:
-      - "5432:5432"
+      - "5433:5432" # 5433 pour votre machine hôte (pgAdmin, DBeaver, etc.)
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -41,7 +41,7 @@ services:
       NODE_ENV: development
       PORT: 3000
       
-      # Connexion PostgreSQL
+      # Connexion PostgreSQL (Fix: Port 5432 pour le réseau interne Docker)
       DATABASE_URL: postgres://postgres:postgrespassword@postgres:5432/payment_db
       
       # Keys Stripe

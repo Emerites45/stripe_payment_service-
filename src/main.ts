@@ -2,11 +2,11 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { json } from 'express';
 
 async function bootstrap() {
   // rawBody: true est indispensable pour vérifier la signature des webhooks Stripe
   const app = await NestFactory.create(AppModule, { rawBody: true });
-
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.enableCors();
 
